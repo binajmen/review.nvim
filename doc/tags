@@ -1,0 +1,16 @@
+:Review-add	review.txt	/*:Review-add*
+:Review-clear	review.txt	/*:Review-clear*
+:Review-delete	review.txt	/*:Review-delete*
+:Review-list	review.txt	/*:Review-list*
+:Review-yank	review.txt	/*:Review-yank*
+<Plug>(ReviewAdd)	review.txt	/*<Plug>(ReviewAdd)*
+<Plug>(ReviewClear)	review.txt	/*<Plug>(ReviewClear)*
+<Plug>(ReviewList)	review.txt	/*<Plug>(ReviewList)*
+<Plug>(ReviewYank)	review.txt	/*<Plug>(ReviewYank)*
+ReviewConfig	review.txt	/*ReviewConfig*
+review	review.txt	/*review*
+review-commands	review.txt	/*review-commands*
+review-config	review.txt	/*review-config*
+review-lazy-nvim	review.txt	/*review-lazy-nvim*
+review-mappings	review.txt	/*review-mappings*
+review.txt	review.txt	/*review.txt*

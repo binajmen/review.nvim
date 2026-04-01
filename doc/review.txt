@@ -1,0 +1,165 @@
+*review.txt*    Annotate code with review comments and export as markdown
+
+Author:   binajmen
+License:  MIT
+Requires: Neovim >= 0.9
+
+==============================================================================
+INTRODUCTION                                                          *review*
+
+review.nvim lets you annotate code with review comments during code review
+sessions. Comments can target visual selections (with code snippets) or
+entire files. All comments can be listed, edited, deleted, and yanked to
+the clipboard as formatted markdown.
+
+The plugin is self-lazy-loading: it registers a single |:Review| command
+and |<Plug>| mappings at startup without loading any Lua modules until
+first use.
+
+==============================================================================
+COMMANDS                                                     *review-commands*
+
+:Review add                                                     *:Review-add*
+    Open a floating window to add a file-level comment for the current file.
+
+:Review list                                                   *:Review-list*
+    Open a floating window listing all comments. Use the configured keys
+    to edit, delete, or close (default: `e`, `d`, `q`).
+
+:Review yank                                                   *:Review-yank*
+    Yank all comments to the system clipboard (`+` register) as markdown.
+
+:Review clear                                                 *:Review-clear*
+    Clear all stored comments.
+
+:Review delete {index}                                       *:Review-delete*
+    Delete a specific comment by its 1-based index number.
+
+==============================================================================
+MAPPINGS                                                     *review-mappings*
+
+The plugin provides |<Plug>| mappings. Map them to your preferred keys:
+>lua
+    vim.keymap.set('v', '<leader>ra', '<Plug>(ReviewAdd)')
+    vim.keymap.set('n', '<leader>ra', '<Plug>(ReviewAdd)')
+    vim.keymap.set('n', '<leader>rl', '<Plug>(ReviewList)')
+    vim.keymap.set('n', '<leader>ry', '<Plug>(ReviewYank)')
+    vim.keymap.set('n', '<leader>rc', '<Plug>(ReviewClear)')
+<
+
+                                                            *<Plug>(ReviewAdd)*
+<Plug>(ReviewAdd)       In visual mode: add a comment on the selected lines,
+                        capturing the code snippet.
+                        In normal mode: add a file-level comment.
+
+                                                           *<Plug>(ReviewList)*
+<Plug>(ReviewList)      List all comments in a floating window.
+
+                                                           *<Plug>(ReviewYank)*
+<Plug>(ReviewYank)      Yank all comments to the system clipboard.
+
+                                                          *<Plug>(ReviewClear)*
+<Plug>(ReviewClear)     Clear all comments.
+
+==============================================================================
+CONFIGURATION                                                  *review-config*
+
+Call `setup()` to override defaults. All fields are optional.
+>lua
+    require('review').setup({
+      float_width = 0.6,       -- Comment input float width (0-1)
+      float_height = 8,        -- Comment input float height (lines)
+      list_width = 0.8,        -- List viewer float width (0-1)
+      list_height_max = 0.8,   -- List viewer max height (0-1)
+      keys = {
+        close = 'q',           -- Close/cancel key in floats
+        edit = 'e',            -- Edit key in list viewer
+        delete = 'd',          -- Delete key in list viewer
+      },
+      signs = {
+        enabled = true,        -- Show signs in the sign column
+        text = 'R',            -- Sign text (1-2 characters)
+        hl = 'DiagnosticInfo', -- Highlight group for the sign
+        priority = 5,          -- Sign priority (gitsigns uses 6)
+      },
+      virtual_lines = {
+        enabled = false,       -- Show comment text as virtual lines
+        prefix = '💬 ',        -- Prefix before each comment line
+        hl = 'DiagnosticInfo', -- Highlight group for virtual lines
+      },
+    })
+<
+
+                                                        *ReviewConfig*
+Fields:~
+  `float_width`      (number)  Width ratio for the comment input float.
+                               Default: `0.6`
+  `float_height`     (number)  Height in lines for the comment input float.
+                               Default: `8`
+  `list_width`       (number)  Width ratio for the list viewer float.
+                               Default: `0.8`
+  `list_height_max`  (number)  Max height ratio for the list viewer float.
+                               Default: `0.8`
+  `keys.close`       (string)  Key to close/cancel floating windows.
+                               Default: `"q"`
+  `keys.edit`        (string)  Key to edit a comment in the list viewer.
+                               Default: `"e"`
+  `keys.delete`      (string)  Key to delete a comment in the list viewer.
+                               Default: `"d"`
+
+                                                        *ReviewSigns*
+Signs:~
+  review.nvim can place signs in the sign column to mark lines that have
+  review comments. Signs use Neovim's extmark API with a dedicated namespace,
+  so they coexist with gitsigns and other sign-based plugins without conflict.
+
+  When multiple signs appear on the same line, Neovim orders them by priority
+  (higher priority wins with `signcolumn=yes:1`). The default priority of 5
+  is lower than gitsigns (6), so git signs take precedence. Use
+  `signcolumn=yes:2` or higher to display both signs side by side.
+
+  `signs.enabled`    (boolean)  Enable sign column indicators.
+                                Default: `true`
+  `signs.text`       (string)   Sign text, 1-2 characters.
+                                Default: `"R"`
+  `signs.hl`         (string)   Highlight group for the sign.
+                                Default: `"DiagnosticInfo"`
+  `signs.priority`   (number)   Sign priority.
+                                Default: `5`
+
+                                                   *ReviewVirtualLines*
+Virtual Lines:~
+  review.nvim can render comment text as virtual lines directly below the
+  commented code, similar to how diagnostics display inline. This is more
+  informative than signs alone but takes vertical space.
+
+  `virtual_lines.enabled`  (boolean)  Enable virtual line display.
+                                      Default: `false`
+  `virtual_lines.prefix`   (string)   Prefix before each comment line.
+                                      Default: `"💬 "`
+  `virtual_lines.hl`       (string)   Highlight group for virtual lines.
+                                      Default: `"DiagnosticInfo"`
+
+==============================================================================
+LAZY.NVIM EXAMPLE                                          *review-lazy-nvim*
+>lua
+    {
+      'your-username/review.nvim',
+      opts = {},
+      keys = {
+        { '<leader>ra', '<Plug>(ReviewAdd)', mode = 'v',
+          desc = 'Review: add comment on selection' },
+        { '<leader>ra', '<Plug>(ReviewAdd)', mode = 'n',
+          desc = 'Review: add file comment' },
+        { '<leader>rl', '<Plug>(ReviewList)',
+          desc = 'Review: list comments' },
+        { '<leader>ry', '<Plug>(ReviewYank)',
+          desc = 'Review: yank comments' },
+        { '<leader>rc', '<Plug>(ReviewClear)',
+          desc = 'Review: clear comments' },
+      },
+    }
+<
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
